@@ -63,7 +63,6 @@ int most_threat(int b, int c){
         for(int i=1; i<n; i++)
             if(adj[0][i] || adj[c][i]) 
                 threat++;
-        //printf("b:%d, c:%d, max_threat:%d\n", b, c, threat);                
         return threat;
     }
     if(pd[b][c] != -1) return pd[b][c];
@@ -73,7 +72,6 @@ int most_threat(int b, int c){
         if(adj[a][b] && dist[a] + 1 == dist[b])
             best = max(best, most_threat(a, b) + G[c][map_edge[a][b]]);
     }
-    //printf("b:%d, c:%d, max_threat:%d\n", b, c, best);                
     return pd[b][c] = best;
 }
 /* Pre-computes the matrix G[a][(b,c)], which represents the number of
@@ -94,7 +92,6 @@ void pre_compute(){
             int v = edges[i].second;
             int b = edges[j].first;
             int c = edges[j].second;
-            //if(dist[a] + 1 != dist[b] || dist[b] + 1 != dist[c]) continue;
             if(!adj[v][b] && !adj[v][c])
                 G[a][j]++;
         }
@@ -131,29 +128,10 @@ int main (){
             continue;
         }
 
-        /*
-        printf("Adjacencias\n");
-        for(int i=0; i<n; i++){
-            printf("%d: ", i);
-            for(int j=0; j<adj[i].size(); j++)
-                printf("%d ", adj[i][j]); 
-            printf("\n");
-        }
-        */
-
         bfs(0, dist);
         int mindist = dist[1];
 
         pre_compute();
-
-        /*
-        printf("Matrix G:\n");
-        for(int i=0; i < n; i++)
-            for(int j = 0; j < 2*m; j++){
-                if(G[i][j])
-                    printf("%d -> (%d, %d): %d\n", i, edges[j].first, edges[j].second, G[i][j]);
-            }
-        */
 
         for(int i = 0; i < n; i++)
             for(int j = 0; j < n; j++)
@@ -166,7 +144,6 @@ int main (){
             
             if(dist[a] + 1 == dist[b] && dist[b] == mindist - 1 && adj[b][1]){
                 max_threat = max(max_threat, most_threat(a, b));
-                //printf("a:%d, b:%d, max_threat:%d\n", a, b, max_threat);            
             }
         }
         
