@@ -1,8 +1,7 @@
 import sys
 from collections import Counter, defaultdict
 
-lst = [int(i) for i in sys.stdin.read().split()]
-h = Counter(lst)
+h = Counter(int(i) for i in sys.stdin.read().split())
 
 def transform(v):
     if v == 0:
@@ -17,8 +16,7 @@ def transform(v):
 def blink(h):
     results = defaultdict(int)
     for k, v in h.items():
-        k2s = transform(k)
-        for k2 in k2s:
+        for k2 in transform(k):
             results[k2] += v
     return results
 
