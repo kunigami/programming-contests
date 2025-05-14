@@ -1,5 +1,4 @@
 import sys
-from enum import auto, Enum
 from lib import Idx, Mat 
 
 b = Mat([line for line in sys.stdin.read().strip().split("\n")])

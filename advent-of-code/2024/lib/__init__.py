@@ -45,7 +45,16 @@ class Mat:
         for i in range(self.h()):
             for j in range(self.w()):
                 self._m[i][j] = v
-        
+        return self
+    
+    def clone(self):
+        print(self._m)
+        m = []
+        for i in range(self.h()):
+            m.append([])
+            for j in range(self.w()):
+                m[-1].append(self._m[i][j])
+        return Mat(m)
 
     @staticmethod
     def new(h, w, value):
@@ -59,4 +68,8 @@ class Mat:
                     v = value                
                 m[-1].append(v)
         return Mat(m)
+ 
+    @staticmethod
+    def from_str(s):
+        return Mat([list(line.strip()) for line in s.strip().split("\n")])
  
