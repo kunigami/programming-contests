@@ -41,6 +41,19 @@ class Mat:
         i, j = idx
         self._m[i][j] = v
 
+    def __str__(self):
+        return "\n".join("".join(row) for row in self._m)
+
+    def swap(self, idx1, idx2):
+        self[idx1], self[idx2] = self[idx2], self[idx1]
+
+    # returns index of first occurrence
+    def find(self, v):
+        for i in range(self.h()):
+            for j in range(self.w()):
+                if self._m[i][j] == v:
+                    return Idx(i, j)
+
     def fill(self, v):
         for i in range(self.h()):
             for j in range(self.w()):
