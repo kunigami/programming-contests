@@ -1,20 +1,20 @@
 import sys
-from lib import Idx, Mat 
+
+from lib import Idx, Mat
 
 lines = [line.strip() for line in sys.stdin.readlines()]
 
+
 def compute_score(b):
-    s = 0
-    for idx in b.indices():
-        if b[idx] == "O":
-            s += 100 * idx[0] + idx[1]
-    return s
+    return sum(100 * idx[0] + idx[1] for idx in b.indices() if b[idx] == "O")
 
 
 DIRS = {">": Idx(0, 1), "v": Idx(1, 0), "<": Idx(0, -1), "^": Idx(-1, 0)}
 
+
 def next(idx, d):
     return idx + DIRS[d]
+
 
 def move_obj(b, idx, d):
     idx1 = next(idx, d)
@@ -34,8 +34,9 @@ def move_obj(b, idx, d):
     if moved:
         b.swap(idx1, idx)
         idx = idx1
-  
+
     return moved, idx
+
 
 i = 0
 b = []
@@ -47,7 +48,7 @@ b = Mat(b)
 
 moves = "".join(lines[i + 1 :])
 print(b)
-idx = b.find('@')
+idx = b.find("@")
 for move in moves:
     _, idx = move_obj(b, idx, move)
 
