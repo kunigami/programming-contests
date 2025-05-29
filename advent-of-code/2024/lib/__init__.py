@@ -1,3 +1,11 @@
+from __future__ import annotations
+from queue import Queue
+from typing import Callable, Iterable
+
+# Raise this exception when you want to stop search.
+class StopSearch(Exception):
+    pass
+
 class Idx: 
     def __init__(self, i, j):
         self._idx = (i, j)
@@ -7,6 +15,12 @@ class Idx:
 
     def __add__(self, o):
         return Idx(self._idx[0] + o._idx[0], self._idx[1] + o._idx[1])
+
+    def __eq__(self, o):
+        return self._idx == o._idx 
+
+    def __str__(self):
+        return f"({self._idx[0]}, {self._idx[1]})"
 
     def adj4(self):
         deltas = [(-1, 0), (0, 1), (1, 0), (0, -1)]
@@ -68,6 +82,25 @@ class Mat:
             for j in range(self.w()):
                 m[-1].append(self._m[i][j])
         return Mat(m)
+
+    def bfs(self, start: Idx, process: Callable[[Mat, Idx, int], Iterable[Idx]]): 
+        visited = Mat.new(self.h(), self.w(), False)
+        q = Queue()
+        q.put((start, 0))
+        while not q.empty():
+            idx, c = q.get()
+            if visited[idx]:
+                continue
+            visited[idx] = True
+
+            try:
+                next_idxs = process(self, idx, c)
+                for idx2 in next_idxs:
+                    if self.within(idx2):
+                        q.put((idx2, c + 1))
+            except StopSearch:
+                return idx, c
+        return None
 
     @staticmethod
     def new(h, w, value):
