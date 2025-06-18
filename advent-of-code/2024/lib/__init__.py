@@ -1,15 +1,24 @@
 from __future__ import annotations
+
 from queue import Queue
-from typing import Callable, Iterable
+from typing import Callable, Iterable, TypeVar
+from dataclasses import dataclass
 
 # Raise this exception when you want to stop search.
 class StopSearch(Exception):
     pass
 
-class Idx: 
+@dataclass
+class BfsResult:
+    idx: Idx
+    dist: int
+    visited: Mat
+
+
+class Idx:
     def __init__(self, i, j):
         self._idx = (i, j)
-    
+
     def __getitem__(self, p):
         return self._idx[p]
 
@@ -17,7 +26,10 @@ class Idx:
         return Idx(self._idx[0] + o._idx[0], self._idx[1] + o._idx[1])
 
     def __eq__(self, o):
-        return self._idx == o._idx 
+        return self._idx == o._idx
+
+    def __lt__(self, o):
+        return self._idx < o._idx
 
     def __str__(self):
         return f"({self._idx[0]}, {self._idx[1]})"
@@ -27,10 +39,13 @@ class Idx:
         for i, j in deltas:
             yield self + Idx(i, j)
 
+    def l1_dist(self, o):
+        return abs(self._idx[0] - o._idx[0]) + abs(self._idx[1] - o._idx[1])
+
 
 class Mat:
     def __init__(self, arr):
-        self._m = arr 
+        self._m = arr
 
     def h(self):
         return len(self._m)
@@ -46,7 +61,7 @@ class Mat:
     def within(self, idx):
         i, j = idx
         return i >= 0 and i < self.h() and j >= 0 and j < self.w()
-            
+
     def __getitem__(self, idx):
         i, j = idx
         return self._m[i][j]
@@ -73,9 +88,13 @@ class Mat:
             for j in range(self.w()):
                 self._m[i][j] = v
         return self
-    
+
+    def map(self, f):
+        for idx in self.indices():
+            self[idx] = f(self[idx], idx)
+        return self
+
     def clone(self):
-        print(self._m)
         m = []
         for i in range(self.h()):
             m.append([])
@@ -83,7 +102,7 @@ class Mat:
                 m[-1].append(self._m[i][j])
         return Mat(m)
 
-    def bfs(self, start: Idx, process: Callable[[Mat, Idx, int], Iterable[Idx]]): 
+    def bfs(self, start: Idx, process: Callable[[Mat, Idx, int], Iterable[Idx]]):
         visited = Mat.new(self.h(), self.w(), False)
         q = Queue()
         q.put((start, 0))
@@ -99,7 +118,7 @@ class Mat:
                     if self.within(idx2):
                         q.put((idx2, c + 1))
             except StopSearch:
-                return idx, c
+                return BfsResult(idx, c, visited)
         return None
 
     @staticmethod
@@ -111,11 +130,17 @@ class Mat:
                 if callable(value):
                     v = value()
                 else:
-                    v = value                
+                    v = value
                 m[-1].append(v)
         return Mat(m)
- 
+
     @staticmethod
     def from_str(s):
         return Mat([list(line.strip()) for line in s.strip().split("\n")])
- 
+
+
+T = TypeVar("T")
+def none_throws(x: T | None) -> T:
+    if x is None:
+        raise Exception("Expected value to be not None")
+    return x
