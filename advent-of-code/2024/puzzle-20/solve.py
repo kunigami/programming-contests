@@ -3,6 +3,20 @@ from collections import defaultdict
 
 from lib import Mat, StopSearch, none_throws
 
+"""
+Idea: for each pair of points in the grid (a, b) we assume that 
+we'll go from s to a normally, then a to b using the cheat and from 
+b to e normally. 
+
+Notes: 
+- We can pre-compute the shortest possible distance d(s, x) from s to 
+  every point x in the grid in a single BFS. Same for d(x, e).
+- The distance d(a, b) using the cheat is the l1 (manhattan) distance.
+- The shortest possible distance from s to e using a cheat from a to b is thus
+- d(s, a) + d(a, b) + d(b, e) 
+
+"""
+
 # parameters
 is_example = True
 is_hard = True
@@ -36,7 +50,7 @@ def process(b, idx, c):
         raise StopSearch()
     return [] if b[idx] == "#" else idx.adj4()
 
-
+# optimal cost without any cheats
 cmax = none_throws(b.bfs(s, process)).dist
 ub = cmax - diff
 print("cmax=", cmax)
@@ -44,8 +58,12 @@ print("cmax=", cmax)
 by_cost1 = defaultdict(list)
 by_cost2 = defaultdict(list)
 
-
+# compute the shortest distances from s to 
+# all points in the grid
 def process1(b, idx, c):
+    # the final distance will need to reach e from idx.
+    # the l1 (manhattan) distance is a lower bound for that
+    # even if we use the cheat.
     if c + e.l1_dist(idx) > ub:
         raise StopSearch()
     if b[idx] == "#":
