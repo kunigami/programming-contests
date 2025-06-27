@@ -1,7 +1,7 @@
 import sys
 
-lines = sys.stdin.read().splitlines()
-M = 25
+ls = sys.stdin.read().splitlines()
+M = 25 # 2 for easy
 
 def index(pad):
     m = {}
@@ -20,14 +20,14 @@ dirs = {
     '<': (0, -1)
 }
 
-def search_for_symbol(sc, ec, symbol, excluded_state) -> list[str]:
+def search_for_symbol(sc, ec, symbol, excl) -> list[str]:
     delta = dirs[symbol]
     new_sc = (sc[0] + delta[0], sc[1] + delta[1])
-    paths = search_paths_rec(new_sc, ec, excluded_state)
+    paths = search(new_sc, ec, excl)
     return [symbol + p for p in paths]
 
-def search_paths_rec(sc, ec, excluded_state) -> list[str]:
-    if sc == excluded_state:
+def search(sc, ec, excl) -> list[str]:
+    if sc == excl:
         return []
 
     if sc == ec:
@@ -45,48 +45,32 @@ def search_paths_rec(sc, ec, excluded_state) -> list[str]:
     
     new_paths: list[str] = []
     for symbol in symbols:
-        new_paths += search_for_symbol(sc, ec, symbol, excluded_state)
+        new_paths += search_for_symbol(sc, ec, symbol, excl)
     return new_paths
 
 memo = {}
 
 def get_paths(s, e, lvl):
-    if s + e in memo:
-        return memo[s + e]
-
-    pad = pad1 if lvl == 0 else pad2
-    paths = search_paths_rec(pad[s], pad[e], excluded_state=pad['*'])
-    memo[s + e] = paths
+    if s + e not in memo:
+        pad = pad1 if lvl == 0 else pad2        
+        memo[s + e] = search(pad[s], pad[e], excl=pad['*'])
     return memo[s + e]
 
 memoc = {}
 
-def compute(a, b, lvl) -> int:
-    key = f"{a}{b}{lvl}"
-    if key in memoc:
-        return memoc[key]
+def path_cost(path, lvl = -1):
+    p = 'A' + path
+    return sum(pair_cost(p[i - 1], p[i], lvl + 1) for i in range(1, len(p)))
 
-    best_cost = 10**1000
-    for path in get_paths(a, b, lvl): 
-        if lvl == M:
-            cost = len(path)
-        else:
-            path = 'A' + path
-            cost = 0
-            for i in range(len(path) - 1):
-                cost += compute(path[i], path[i + 1], lvl + 1)
 
-        best_cost = min(best_cost, cost)
-    
-    memoc[key] = best_cost
-    return best_cost
+def pair_cost(a, b, l) -> int:
+    key = f"{a}{b}{l}"
+    if key not in memoc:
+        memoc[key] = min(
+            len(p) if l == M else path_cost(p, l) for p in get_paths(a, b, l)
+        )        
+    return memoc[key]
 
-t = 0
-for l in lines:
-    l = 'A' + l
-    c = 0
-    for i in range(len(l) - 1):
-        c += compute(l[i], l[i + 1], 0)
-    t += (c * int(l[1:-1]))
+t = sum((path_cost(l) * int(l[1:-1])) for l in ls)
     
 print(t)
