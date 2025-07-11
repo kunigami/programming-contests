@@ -7,14 +7,14 @@ for l in sys.stdin.readlines():
     adj[x].add(y)
     adj[y].add(x)
 
-curr_tpls = [([x], adj[x]) for x in adj.keys()]
-while len(curr_tpls) > 1:
-    new_tpls = []
-    for ls, adjs in curr_tpls:        
+curr = [([x], adj[x]) for x in adj.keys()]
+while len(curr) > 1:
+    new = []
+    for ls, adjs in curr:        
         for k in adjs:
             if k > ls[-1]:                
-                new_tpls.append((ls + [k], adjs & adj[k]))
+                new.append((ls + [k], adjs & adj[k]))
 
-    curr_tpls = new_tpls
+    curr = new
 
-print(curr_tpls[0][0])
+print(curr[0][0])
