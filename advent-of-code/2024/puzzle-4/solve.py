@@ -42,29 +42,19 @@ def solve(matrix):
     return cnt
 
 
-def is_ms(c1, c2):
-    if c1 == "M" and c2 == "S":
-        return True
-    if c1 == "S" and c2 == "M":
-        return True
-    return False
+def is_ms(cc):
+    return cc == "MS" or cc == "SM"
 
 
-def solve2(matrix):
-    n = len(matrix)
-    m = len(matrix[0])
-
+def solve2(b):
     cnt = 0
-    for i in range(1, n - 1):
-        for j in range(1, m - 1):
-            if matrix[i][j] != "A":
-                continue
-            tl = matrix[i - 1][j - 1]
-            tr = matrix[i - 1][j + 1]
-            bl = matrix[i + 1][j - 1]
-            br = matrix[i + 1][j + 1]
-            if is_ms(tl, br) and is_ms(tr, bl):
-                cnt += 1
+    for i in range(1, len(b) - 1):
+        for j in range(1, len(b[0]) - 1):
+            if b[i][j] == "A":
+                if is_ms(b[i - 1][j + 1] + b[i + 1][j + 1]) and is_ms(
+                    b[i - 1][j + 1] + b[i + 1][j - 1]
+                ):
+                    cnt += 1
     return cnt
 
 
