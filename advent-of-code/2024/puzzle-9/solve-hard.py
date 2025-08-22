@@ -2,7 +2,7 @@ import sys
 
 digit_string = sys.stdin.read().strip()
 
-digit_list = [int(digit) for digit in digit_string]
+digit_list = [int(d) for d in digit_string]
 n = len(digit_list)
 
 result = [
@@ -10,17 +10,6 @@ result = [
     for index, digit in enumerate(digit_list)
 ]
 
-# print(result)
-
-
-def render(result):
-    s = ""
-    for sz, lbl in result:
-        if lbl == -1:
-            s += "." * sz
-        else:
-            s += str(lbl) * sz
-    print(s)
 
 def calc(result):
     s = 0
@@ -30,7 +19,8 @@ def calc(result):
             for i in range(sz):
                 s += (p + i) * lbl
         p += sz
-    return s        
+    return s
+
 
 temp = result.copy()
 i = n - 1
@@ -52,7 +42,7 @@ for i in reversed(range(n)):
 
             continue
 
-        if rj[1] != -1: 
+        if rj[1] != -1:
             new_result.append(rj)
         else:
             if rj[0] >= sz and not moved:
@@ -65,6 +55,5 @@ for i in reversed(range(n)):
                 new_result.append(rj)
 
     temp = new_result
-    # print(temp)
-# render(temp)
+
 print(calc(temp))
