@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from queue import Queue
 from typing import Callable, Iterable, TypeVar
-from dataclasses import dataclass
+
 
 # Raise this exception when you want to stop search.
 class StopSearch(Exception):
     pass
+
 
 @dataclass
 class BfsResult:
@@ -53,10 +56,15 @@ class Mat:
     def w(self):
         return len(self._m[0])
 
-    def indices(self):
-        for i in range(self.h()):
-            for j in range(self.w()):
-                yield Idx(i, j)
+    def indices(self, is_reverse=False):
+        if is_reverse:
+            for i in reversed(range(self.h())):
+                for j in reversed(range(self.w())):
+                    yield Idx(i, j)
+        else:
+            for i in range(self.h()):
+                for j in range(self.w()):
+                    yield Idx(i, j)
 
     def within(self, idx):
         i, j = idx
@@ -140,6 +148,8 @@ class Mat:
 
 
 T = TypeVar("T")
+
+
 def none_throws(x: T | None) -> T:
     if x is None:
         raise Exception("Expected value to be not None")
