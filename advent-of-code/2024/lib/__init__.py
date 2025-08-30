@@ -37,10 +37,15 @@ class Idx:
     def __str__(self):
         return f"({self._idx[0]}, {self._idx[1]})"
 
-    def adj4(self):
-        deltas = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+    def adj4(self, filter=None):
+        yield from self.adj([(-1, 0), (0, 1), (1, 0), (0, -1)], filter)
+
+    def adj(self, deltas, filter=None):
         for i, j in deltas:
-            yield self + Idx(i, j)
+            nidx = self + Idx(i, j)
+            if filter and not filter(self, nidx):
+                continue
+            yield nidx
 
     def l1_dist(self, o):
         return abs(self._idx[0] - o._idx[0]) + abs(self._idx[1] - o._idx[1])
