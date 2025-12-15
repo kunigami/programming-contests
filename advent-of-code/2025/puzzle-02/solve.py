@@ -3,10 +3,9 @@ import sys
 
 
 def read_input():
-    inp = sys.stdin.read()
     ranges = []
     max_val = 0
-    for c in inp.split(","):
+    for c in sys.stdin.read().split(","):
         l, r = c.split("-")
         ranges.append((int(l), int(r)))
         max_val = max(max_val, int(r))
@@ -15,15 +14,11 @@ def read_input():
 
 
 def precompute_dup(rep, covered, max_len=10):
-
     n = max_len // rep
-    n10 = 10**n
-
-    memo = [0] * n10
+    memo = [0] * (10**n)
     cnt = 0
-    for i in range(n10):
-        s = str(i)
-        ss = s * rep
+    for i in range(len(memo)):
+        ss = str(i) * rep
         if ss not in covered:
             cnt += int(ss)
             covered.add(ss)
@@ -37,7 +32,11 @@ def chunk(v, l):
     return [int(v[i : i + l]) for i in range(0, len(v), l)]
 
 
-def is_above(chunks):
+# determine if the number chunked is after
+# the one repeated n-times. examples:
+# 23-23-45 is after 23-23-23
+# 23-21-45 is not.
+def is_after(chunks):
     first = chunks[0]
     for i in range(1, len(chunks)):
         if chunks[i] > first:
@@ -57,14 +56,16 @@ def count_dup(rep, memo, v):
         sz = l // rep
         chunks = chunk(v, sz)
         index = chunks[0]
-        # exclude current dupe
-        if not is_above(chunks):
+        if not is_after(chunks):
             index -= 1
     return memo[index]
 
 
 def solve(reps):
     cs = read_input()
+    # need to make sure a number is not covered by
+    # more than one rep. an example is 222222 which
+    # is covered by 2 (222-222) and 3 (22-22-22)
     covered = set()
 
     t = 0
@@ -74,7 +75,6 @@ def solve(reps):
             lc = count_dup(rep, memo, str(l - 1))
             rc = count_dup(rep, memo, str(r))
             t += rc - lc
-            print(l, r, lc, rc, rc - lc)
 
     return t
 
